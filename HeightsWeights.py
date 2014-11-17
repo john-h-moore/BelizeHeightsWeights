@@ -1,4 +1,5 @@
 import csv, os
+from fuzzywuzzy import fuzz
 
 inputPath = os.path.dirname(os.path.realpath(__file__)) + '/input'
 outputPath = os.path.dirname(os.path.realpath(__file__)) + '/output'
@@ -29,6 +30,22 @@ def appendData(allSchoolDict, oneClassDict):
 		# 			allSchoolDict[allSchoolKey].append(oneClassDict[classKey])
 		# 	else:
 		# 		oneClassDict[classKey].append('No match')
+		for allSchoolKey in allSchoolDict.keys():
+			asName = allSchoolKey[0]
+			asGender = allSchoolKey[1]
+			asDOB = allSchoolKey[2]
+			if gender == asGender:
+				if (name == asName) and (fuzz.ratio(dob, asDOB) >= 90):
+					allSchoolDict[allSchoolKey].append(oneClassDict[classKey])
+					oneClassDict[classKey].append('Match found')
+				elif (name == asName) and (fuzz.ratio(dob, asDOB) < 90):
+					allSchoolDict[allSchoolKey].append(oneClassDict[classKey])
+					oneClassDict[classKey].append('DOB match less than 90 (%s, %s)' %(dob, asDOB))
+				elif (90 < fuzz.ratio(name, asName) < 100) and (fuzz.ratio(dob, asDOB) >= 90):
+					allSchoolDict[allSchoolKey].append(oneClassDict[classKey])
+					oneClassDict[classKey].append('Name match between 90 and 100 (%s, %s) ' %(name, asName))
+				elif (75 < fuzz.ratio(name, asName) < 90) and (fuzz.ratio(dob, asDOB) >= 90):
+					oneClassDict[classKey].append('Name match between 75 and 90 (%s, %s) - no data inserted' %(name, asName))
 	return oneClassDict
 
 def prepare(allSchoolFilename):
