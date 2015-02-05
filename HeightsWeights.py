@@ -57,3 +57,28 @@ def prepare(allSchoolFilename):
 			oneClassDict = readInCSV(inputPath + '/' + csvfilepath)
 			classDicts[teacher] = oneClassDict
 	return allSchoolDict, classDicts
+
+def buildNewAllSchool(oldAllSchoolPath, newRosterPath):
+	oldAllSchool = readInCSV(oldAllSchoolPath)
+	newRoster = readInCSV(newRosterPath)
+	for newKey in newRoster.keys():
+		name = newKey[0]
+		gender = newKey[1]
+		dob = newKey[2]
+		for oldKey in oldAllSchool.keys():
+			oldName = oldKey[0]
+			oldGender = oldKey[1]
+			oldDOB = oldKey[2]
+			if gender == oldGender:
+				if (name.strip() == oldName.strip()) and (fuzz.ratio(dob, oldDOB) >= 90):
+					newRoster[newKey].append(oldAllSchool[oldKey])
+					oldAllSchool[oldKey].append('Match found')
+				elif (name.strip() == oldName.strip()) and (fuzz.ratio(dob, oldDOB) < 90):
+					newRoster[newKey].append(oldAllSchool[oldKey])
+					oldAllSchool[oldKey].append('DOB match less tan 90 (%s, %s)' %(dob, oldDOB))
+				elif (90 < fuzz.ratio(name.strip(), oldName.strip()) < 100) and (fuzz.ratio(dob, oldDOB) >= 90):
+					newRoster[newKey].append(oldAllSchool[oldKey])
+					oldAllSchool[oldKey].append('Name match between 90 and 100 (%s, %s)' %(name, oldName))
+				elif (75 < fuzz.ratio(name.strip(), oldName.strip()) < 90) and (fuzz.ratio(dob, oldDOB) >= 90):
+					oldAllSchool[oldKey].append('Name match between 75 and 90 (%s, %s) - no data inserted' %(name, oldName))
+	
