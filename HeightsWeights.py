@@ -93,6 +93,7 @@ def buildNewAllSchool(oldAllSchoolPath, newRosterPath):
 					oldAllSchool[oldKey].append('Name match between 90 and 100 (%s, %s)' %(name, oldName))
 				elif (75 < fuzz.ratio(name.strip(), oldName.strip()) < 90) and (fuzz.ratio(dob, oldDOB) >= 90):
 					oldAllSchool[oldKey].append('Name match between 75 and 90 (%s, %s) - no data inserted' %(name, oldName))
+	return oldAllSchool, newRoster
 
 def execute(allSchoolFilename):
 	data = prepare(allSchoolFilename)
@@ -104,3 +105,8 @@ def execute(allSchoolFilename):
 	writeOutCSV(allSchoolDict, outputPath + '/all_school.csv')
 	for className in modifiedClasses.keys():
 		writeOutCSV(modifiedClasses[className], outputPath + '/' + className + '.csv')
+
+def executeNewAllSchool(oldAllSchoolPath, newRosterPath):
+	oldAllSchool, newRoster = buildNewAllSchool(oldAllSchoolPath, newRosterPath)
+	writeOutCSV(oldAllSchool, outputPath + '/oldAllSchool.csv')
+	writeOutCSV(newRoster, outputPath + '/newRoster.csv')
